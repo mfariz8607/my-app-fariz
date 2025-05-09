@@ -1,74 +1,161 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Text, View, StyleSheet, Image, Pressable, ScrollView } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { router } from "expo-router";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const Home = () => {
+  const ongoToDetail = () => {
+    router.push("/detail");
+  };
 
-export default function HomeScreen() {
+  const onStartCourse = () => {
+    router.push("/course");
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <SafeAreaProvider>
+      <ScrollView style={styles.container}>
+        {cards.map((card, index) => {
+          const isEnabled = card.title === "React DOM";
+          return (
+            <View key={index} style={styles.cardContainer}>
+              <Image source={{ uri: card.image }} style={styles.imageStyles} />
+              <View style={styles.cardInfo}>
+                <View style={styles.infoHeader}>
+                  <Text style={styles.title}>{card.title}</Text>
+                  <Text style={styles.category}>{card.date}</Text>
+                </View>
+                <Text style={styles.description}>{card.description}</Text>
+                <View style={styles.buttonContainer}>
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.button,
+                      { backgroundColor: pressed && isEnabled ? "#6c2d7d" : "#841584" },
+                    ]}
+                    onPress={isEnabled ? ongoToDetail : undefined}
+                  >
+                    <Text style={styles.buttonText}>Preview</Text>
+                  </Pressable>
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.button,
+                      { backgroundColor: pressed && isEnabled ? "#0052cc" : "#007aff" },
+                    ]}
+                    onPress={isEnabled ? onStartCourse : undefined}
+                  >
+                    <Text style={styles.buttonText}>Start</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          );
+        })}
+      </ScrollView>
+    </SafeAreaProvider>
   );
-}
+};
+
+const cards = [
+  {
+    title: "React DOM",
+    date: "Mei 2025",
+    description:
+      "React DOM is the part of the React library responsible for rendering React components to the actual DOM (Document Object Model) in web browsers.",
+    image:
+      "https://blog.openreplay.com/images/reacts-virtual-dom/images/hero.png",
+  },
+  {
+    title: "React Native Navigation",
+    date: "March 2025",
+    description:
+      "React Native Navigation refers to the tools and libraries used to handle screen-to-screen movement (also called routing or navigation) in a React Native app.",
+    image: "https://ucarecdn.com/d74c629f-9f50-4643-9ccd-81b62f25d9ff/",
+  },
+  {
+    title: "React Animations",
+    date: "April 2025",
+    description:
+      "React Animation is the process of adding visual effects, transitions, or motion to UI elements in a React application to make the interface more dynamic and engaging.",
+    image: "https://www.bacancytechnology.com/qanda/wp-content/uploads/2024/02/React-Animation-for-Individual-Photos.png",
+  },
+  {
+    title: "React Suspense and Lazy",
+    date: "Februari 2025",
+    description:
+      "React Suspense and lazy are features in React that help you implement code-splitting — loading components only when they're needed — which can improve performance by reducing the initial load time of your application.",
+    image: "https://refine.ams3.cdn.digitaloceanspaces.com/blog/2022-12-07-react-lazy/social-2.png",
+  },
+];
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    padding: 15,
+    marginBottom: 10
   },
-  stepContainer: {
-    gap: 8,
+  cardContainer: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    marginBottom: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  imageStyles: {
+    width: "100%",
+    height: 225,
+    resizeMode: "cover",
+  },
+  titleOverlay: {
+    position: "absolute",
+    top: 120,
+    alignSelf: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
+    color: "white",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 8,
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  cardInfo: {
+    padding: 15,
+  },
+  infoHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  title: {
+    fontWeight: "bold",
+    fontSize: 16,
+    flex: 1,
+  },
+  category: {
+    color: "#666",
+    fontSize: 13,
+  },
+  description: {
+    fontSize: 14,
+    color: "#333",
+    marginBottom: 10,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  button: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 6,
+    alignItems: "center",
+    backgroundColor: "#841584",
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
+
+export default Home;
