@@ -19,7 +19,7 @@ export default function Index() {
             colors={['#4c669f', '#3b5998', '#192f6a']}
             style={styles.container}
         >
-            <Text style={styles.textLogo}>Elearning</Text>
+            <Text style={styles.textLogo}>E-Learning</Text>
             <Text style={styles.textSubLogo}>
                 Belajar pemrograman semakin mudah
             </Text>

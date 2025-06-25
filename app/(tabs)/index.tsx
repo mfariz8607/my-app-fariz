@@ -1,55 +1,100 @@
-import { Text, View, StyleSheet, Image, Pressable, ScrollView } from "react-native";
+import { FlatList, Text, View, StyleSheet, Image, Pressable, ScrollView, ToastAndroid } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import axios from "axios";
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setData } from "../../store/reducer/kursusSlice";
+import { CourseCard } from "@/components/courseCard";
 
 const Home = () => {
-  const ongoToDetail = () => {
-    router.push("/detail");
+  const dispatch = useDispatch();
+  const kursusList = useSelector(state => state.kursus.data)
+
+  const ongoToDetail = (itemId:String) => {
+    router.push(`/detail?id=${itemId}`);
   };
 
   const onStartCourse = () => {
     router.push("/course");
   };
 
+  const onGetData = async () => {
+    try {
+      const response = await axios.get("https://elearning-api-fariz.vercel.app/api/kursus");
+      dispatch(setData(response.data.data))
+    } catch (error) {
+        dispatch(setData([]));
+        const message = error?.message || 'Gagal mengambil data';
+
+        ToastAndroid.showWithGravity(
+          message,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      }
+  }
+
+  useEffect (() => {
+    onGetData();
+  }, []);
+
   return (
     <SafeAreaProvider>
-      <ScrollView style={styles.container}>
-        {cards.map((card, index) => {
-          const isEnabled = card.title === "React DOM";
-          return (
-            <View key={index} style={styles.cardContainer}>
-              <Image source={{ uri: card.image }} style={styles.imageStyles} />
-              <View style={styles.cardInfo}>
-                <View style={styles.infoHeader}>
-                  <Text style={styles.title}>{card.title}</Text>
-                  <Text style={styles.category}>{card.date}</Text>
-                </View>
-                <Text style={styles.description}>{card.description}</Text>
-                <View style={styles.buttonContainer}>
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.button,
-                      { backgroundColor: pressed && isEnabled ? "#6c2d7d" : "#841584" },
-                    ]}
-                    onPress={isEnabled ? ongoToDetail : undefined}
-                  >
-                    <Text style={styles.buttonText}>Preview</Text>
-                  </Pressable>
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.button,
-                      { backgroundColor: pressed && isEnabled ? "#0052cc" : "#007aff" },
-                    ]}
-                    onPress={isEnabled ? onStartCourse : undefined}
-                  >
-                    <Text style={styles.buttonText}>Start</Text>
-                  </Pressable>
-                </View>
-              </View>
-            </View>
-          );
-        })}
-      </ScrollView>
+      <FlatList
+                onRefresh={() => onGetData()}
+                refreshing={false}
+                data={kursusList}
+                renderItem={({item}) => 
+                    <CourseCard
+                        onGoToDetail={()=>ongoToDetail(item._id)}
+                        onStartCourse={onStartCourse}
+                        catergory={item.kategori}
+                        title={item.title}
+                        deskription={item.deskripsi}
+                        image={item.img_url}
+                        tanggal={item.tgl}
+                     />
+                }
+                keyExtractor={item => item._id}
+            />
+      {/* // <ScrollView style={styles.container}>
+      //   {cards.map((card, index) => {
+      //     const isEnabled = card.title === "React DOM";
+      //     return (
+      //       <View key={index} style={styles.cardContainer}>
+      //         <Image source={{ uri: card.image }} style={styles.imageStyles} />
+      //         <View style={styles.cardInfo}>
+      //           <View style={styles.infoHeader}>
+      //             <Text style={styles.title}>{card.title}</Text>
+      //             <Text style={styles.category}>{card.date}</Text>
+      //           </View>
+      //           <Text style={styles.description}>{card.description}</Text>
+      //           <View style={styles.buttonContainer}>
+      //             <Pressable
+      //               style={({ pressed }) => [
+      //                 styles.button,
+      //                 { backgroundColor: pressed && isEnabled ? "#6c2d7d" : "#841584" },
+      //               ]}
+      //               onPress={isEnabled ? ongoToDetail : undefined}
+      //             >
+      //               <Text style={styles.buttonText}>Preview</Text>
+      //             </Pressable>
+      //             <Pressable
+      //               style={({ pressed }) => [
+      //                 styles.button,
+      //                 { backgroundColor: pressed && isEnabled ? "#0052cc" : "#007aff" },
+      //               ]}
+      //               onPress={isEnabled ? onStartCourse : undefined}
+      //             >
+      //               <Text style={styles.buttonText}>Start</Text>
+      //             </Pressable>
+      //           </View>
+      //         </View>
+      //       </View>
+      //     );
+      //   })}
+      // </ScrollView> */}
     </SafeAreaProvider>
   );
 };

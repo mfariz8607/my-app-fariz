@@ -1,9 +1,15 @@
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 
-export const Info = () => {
+interface InfoProps {
+    description?: string;
+}
+
+export const Info = (props:InfoProps) => {
     return (
         <ScrollView style={styles.container}>
-            <View style={styles.exclusiveLabel}>
+            <Text> {props.description} </Text>
+            
+            {/* <View style={styles.exclusiveLabel}>
                 <Text style={styles.exclusiveText}>Exclusive</Text>
             </View>
 
@@ -80,7 +86,7 @@ export const Info = () => {
 
             <TouchableOpacity style={styles.button}>
                 <Text style={styles.buttonText}>Lihat Kelas</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </ScrollView>
     );
 };

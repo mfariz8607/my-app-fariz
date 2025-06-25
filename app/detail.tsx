@@ -1,12 +1,53 @@
-import { Text, View, StyleSheet, TouchableOpacity, Animated, Dimensions } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, Animated, Dimensions, ToastAndroid } from "react-native";
 import { Info, Materi } from "../components/modules/detail";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useLocalSearchParams } from "expo-router";
+import axios from "axios";
 
 const { width } = Dimensions.get("window");
 
 const Detail = () => {
     const [activeTab, setActiveTab] = useState("info");
     const indicatorPosition = useRef(new Animated.Value(0)).current;
+    const { id } = useLocalSearchParams();
+    const [itemTopic, setItemTopic] = useState([]);
+    const [description, setDescription] = useState('');
+
+    const onGetData = async () => {
+    try {
+      const response = await axios.get(`https://elearning-api-fariz.vercel.app/api/kursus/${id}`);
+
+      setDescription(response.data.data.deskripsi);
+
+      if(response.data.data.content && response.data.data.content.length > 0) {
+        const topic = response.data.data.content.map((item:any, index:Number) => {
+            return {
+                id: index.toString(),
+                title: item.type,
+                describe: item.type,
+            }
+        });
+        setItemTopic(topic);
+      }
+    } catch (error) {
+        const message = error?.message || 'Gagal mengambil data';
+        ToastAndroid.showWithGravity(
+          message,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      }
+  }
+
+  const UIActiveTabs = () => {
+    if (activeTab == "info") return <Info description={description} />
+    if (activeTab == "materi") return <Materi />
+    return <Info description={description} />
+  }
+
+  useEffect (() => {
+    onGetData();
+  }, []);
 
     const handleTabPress = (tab) => {
         setActiveTab(tab);

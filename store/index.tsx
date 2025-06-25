@@ -4,6 +4,7 @@ import counterReducer from "./reducer/counterSlice";
 import quizReducer from "./reducer/quizSlice";
 import profileReducer from "./reducer/profileSlice";
 import topicReducer from "./reducer/topicSlice";
+import kursusSlice from "./reducer/kursusSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     quiz: quizReducer,
     profile: profileReducer,
     topic: topicReducer,
+    kursus: kursusSlice,
   },
 });
 
