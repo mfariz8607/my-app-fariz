@@ -1,8 +1,8 @@
-import { FlatList, Text, View, StyleSheet, Image, Pressable, ScrollView, ToastAndroid } from "react-native";
+import { FlatList, Text, View, StyleSheet, Image, Pressable, ScrollView, ToastAndroid, TextInput, Button } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setData } from "../../store/reducer/kursusSlice";
 import { CourseCard } from "@/components/courseCard";
@@ -10,6 +10,7 @@ import { CourseCard } from "@/components/courseCard";
 const Home = () => {
   const dispatch = useDispatch();
   const kursusList = useSelector(state => state.kursus.data)
+  const [searchQuery, setSearchQuery] = useState('');
 
   const ongoToDetail = (itemId:String) => {
     router.push(`/detail?id=${itemId}`);
@@ -21,7 +22,13 @@ const Home = () => {
 
   const onGetData = async () => {
     try {
-      const response = await axios.get("https://elearning-api-fariz.vercel.app/api/kursus");
+      dispatch(setData([]))
+      const params={
+        filter: searchQuery,
+      }
+      const response = await axios.get("https://elearning-api-fariz.vercel.app/api/kursus",
+        { params }
+      );
       dispatch(setData(response.data.data))
     } catch (error) {
         dispatch(setData([]));
@@ -41,6 +48,21 @@ const Home = () => {
 
   return (
     <SafeAreaProvider>
+      <View style={styles.formContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Search..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <View style={{ display: 'flex', justifyContent: 'center' }}>
+          <Button
+            title="Submit"
+            onPress={()=>onGetData()}
+          />
+        </View>
+      </View>
+
       <FlatList
                 onRefresh={() => onGetData()}
                 refreshing={false}
@@ -201,6 +223,17 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
+  input: {
+    flex: 1,
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
+  formContainer: {
+    display: 'flex',
+    flexDirection: 'row'
+  }
 });
 
 export default Home;
